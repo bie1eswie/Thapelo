@@ -7,10 +7,26 @@ namespace Deltatre.Interview.WebApplication.Controllers;
 [Route("[controller]")]
 public class EarthWeatherForecastController : ControllerBase
 {
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    private readonly IEarthWeatherForecastService _forecastService;
+    private readonly ILogger<EarthWeatherForecastController> _logger;
+
+    public EarthWeatherForecastController(IEarthWeatherForecastService earthWeatherForecastService, ILogger<EarthWeatherForecastController> logger)
     {
-        var forecastService = new EarthWeatherForecastService();
-        return forecastService.GetForecast();
+        _forecastService = earthWeatherForecastService;
+        _logger = logger;
+    }
+
+    [HttpGet(Name = "GetWeatherForecast")]
+    public ActionResult<IEnumerable<WeatherForecast>> Get()
+    {
+        try
+        {
+            return Ok(_forecastService.GetForecast());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(exception: ex,ex.Message);
+            return BadRequest();
+        }
     }
 }
